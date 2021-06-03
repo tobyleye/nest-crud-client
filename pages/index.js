@@ -1,65 +1,71 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import Head from "next/head";
+import { useEffect, useState } from "react";
+import Todo from "../components/Todo";
+
+const baseURL = "https://three-little-birds.herokuapp.com/todos/";
 
 export default function Home() {
+  const [todos, setTodos] = useState([]);
+  useEffect(() => {
+    async function fetchTodos() {
+      const todos = await fetch(baseURL).then((res) => res.json());
+      setTodos(todos);
+    }
+    fetchTodos();
+  }, []);
+
+  const makeAsComplete = async (id) => {
+    await fetch(baseURL + `${id}/complete`, {
+      method: "POST",
+    }).then((res) => res.json());
+
+    // update state;
+    setTodos((todos) => {
+      return todos.map((todo) => {
+        if (todo.id === id) {
+          return {
+            ...todo,
+            completed: true,
+          };
+        }
+        return todo;
+      });
+    });
+  };
+
+  const completed = todos.filter((todo) => todo.completed === true).length;
+
   return (
-    <div className={styles.container}>
+    <main className="h-screen  w-screen grid place-items-center">
       <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>Todo</title>
       </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+      <div className="container bg-yellow-100 mx-auto p-5">
+        <header className="border-b border-black mb-5 flex justify-between">
+          <h3 className="text-xl font-medium">Welcome to Todo</h3>
+          <div>
+            <span>{completed}</span> / <span>{todos.length}</span>
+          </div>
+        </header>
+        <div>
+          <ul>
+            {todos.map((todo) => {
+              return (
+                <li key={todo.id} className="list-none mb-4">
+                  <Todo todo={todo} onMarkAsComplete={makeAsComplete} />
+                </li>
+              );
+            })}
+          </ul>
         </div>
-      </main>
+      </div>
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
+      <style>{`
+            .container {
+              max-width: 500px;
+              width: 100%
+            }
+    `}</style>
+    </main>
+  );
 }
