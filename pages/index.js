@@ -49,6 +49,7 @@ export default function Home() {
       const { data: newtodo } = await client.post("/todos", { todo });
       setTodos((todos) => todos.concat(newtodo));
     } catch (err) {
+      // do some error handling here
       throw err;
     }
   }
