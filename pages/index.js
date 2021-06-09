@@ -44,6 +44,17 @@ export default function Home() {
     }
   };
 
+  async function deleteTodo(id) {
+    console.log("deleting todo id", id);
+    try {
+      await client.delete(`todos/${id}`);
+      setTodos((todos) => todos.filter((todo) => todo.id !== id));
+    } catch (err) {
+      // handle error
+      throw err;
+    }
+  }
+
   async function addNewTodo(todo) {
     try {
       const { data: newtodo } = await client.post("/todos", { todo });
@@ -69,7 +80,11 @@ export default function Home() {
               {todos.map((todo) => {
                 return (
                   <li key={todo.id} className="list-none mb-4">
-                    <Todo todo={todo} onMarkAsComplete={makeAsComplete} />
+                    <Todo
+                      todo={todo}
+                      onMarkAsComplete={makeAsComplete}
+                      onDelete={deleteTodo}
+                    />
                   </li>
                 );
               })}
