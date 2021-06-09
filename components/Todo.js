@@ -17,7 +17,7 @@ export default function Todo({ todo, onMarkAsComplete, onDelete }) {
 
       {todo.completed && (
         <button
-          onClick={() => onDelete(todo.id)}
+          onClick={onDelete.bind(this, todo.id)}
           className="trash cursor-pointer  hidden ml-2"
         >
           <Trash />

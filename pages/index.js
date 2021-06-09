@@ -45,7 +45,6 @@ export default function Home() {
   };
 
   async function deleteTodo(id) {
-    console.log("deleting todo id", id);
     try {
       await client.delete(`todos/${id}`);
       setTodos((todos) => todos.filter((todo) => todo.id !== id));
